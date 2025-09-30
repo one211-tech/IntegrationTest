@@ -53,4 +53,5 @@ public class LoginClient {
         Map<String, String> tokenResponse = provider.getMapper().readValue(response.body(), new TypeReference<>() {});
         return tokenResponse.get("token");
     }
+
 }

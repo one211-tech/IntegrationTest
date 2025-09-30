@@ -20,12 +20,12 @@ public class UserClient {
 
     public UserClient(String baseUrl, String jwtToken) {
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(10))
+                .connectTimeout(Duration.ofSeconds(40))
                 .build();
         this.baseUrl = baseUrl;
         this.jwtToken = jwtToken;
         this.objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule()); // ✅ support LocalDateTime
+                .registerModule(new JavaTimeModule());
     }
 
     public User addUser(long orgId, User user) throws Exception {
@@ -35,7 +35,7 @@ public class UserClient {
                 .uri(URI.create(baseUrl + "/api/orgs/" + orgId + "/users"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", jwtToken.startsWith("Bearer ") ? jwtToken : "Bearer " + jwtToken)
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofSeconds(40))
                 .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
                 .build();
 
@@ -50,4 +50,16 @@ public class UserClient {
 
         return objectMapper.readValue(response.body(), User.class);
     }
+    public boolean deleteUser(long orgId, String userName) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(baseUrl + "/api/orgs/" + orgId + "/users/" + userName))
+                .header("Authorization", jwtToken.startsWith("Bearer ") ? jwtToken : "Bearer " + jwtToken)
+                .timeout(Duration.ofSeconds(40))
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        return true;
+    }
+
 }

@@ -1,9 +1,8 @@
-version: "3.9"
 services:
   # ---------- Postgres ----------
   postgres:
     image: postgres:17.5
-    container_name: application-database
+    container_name: application-database2
     environment:
       POSTGRES_USER: piyushm
       POSTGRES_PASSWORD: Piyush@9
@@ -12,6 +11,13 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  # ---------- Frontend ----------
+  frontend:
+    image: react-app:latest
+    container_name: application-frontend
+    ports:
+      - "5173:5173"
 
   # ---------- Backend ----------
   backend:
@@ -26,11 +32,33 @@ services:
     ports:
       - "8080:8080"
 
-  # ---------- Frontend ----------
-  frontend:
-    image: react-app:latest
-    container_name: application-frontend
+  # ---------- SQL Controller ----------
+  sql-controller:
+    image: flight-sql-duckdb:latest
+    container_name: sql-controller
     depends_on:
       - backend
+    command: >
+      controller
+      --conf flight-sql-controller.host=sql-controller
+      --conf flight-sql-controller.httpLogin=true
+      --conf flight-sql-controller.jwt.token.generation.enabled=false
+      --conf flight-sql-controller.jwt.token.secretKey=Xr7uYyL1p82bqS7dOqY5wrWb3YyF0TwQh8M9Z7Yz8Kz1c4Y3wTqZl9gN8mD7uC4yU2xJ8aQ5p9XoB3sD7yT9l8hG1k3uR2a
     ports:
-      - "5173:5173"
+      - "59307:59307"
+
+  # ---------- SQL Executor ----------
+  sql-executor:
+    image: flight-sql-duckdb:latest
+    container_name: sql-executor
+    command: >
+      executor
+      --conf flight-sql-executor.controllers.0.host=sql-controller
+      --conf flight-sql-executor.controllers.0.port=59307
+      --conf flight-sql-executor.cluster=cc1
+    depends_on:
+      - sql-controller
+
+# 👇 this part was missing
+volumes:
+  postgres_data:
