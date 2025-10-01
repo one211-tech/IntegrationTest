@@ -72,7 +72,7 @@ public class SqlApplicationTest {
                         Map.of("database", "memory",
                                 "schema", "main",
                                 "cluster", "cc1",
-                                "login.url", "http://localhost:8080/api/login"
+                                "login.url", "http://localhost:8080/login"
                 )))
                 .verifyServer(false)
                 .build();
