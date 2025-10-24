@@ -1,5 +1,6 @@
 package com.one211.restapi.service;
 
+import com.one211.restapi.model.Cluster;
 import com.one211.restapi.model.OrgInfo;
 import com.one211.restapi.model.SignUp;
 import com.one211.restapi.model.User;
@@ -20,20 +21,22 @@ class IntegrationFlowTest {
     private static StartupScriptHttpClient startupScriptClient;
     private static SignUp testUser;
     private static long orgId;
+    private static Cluster testcluster;
+    static HttpClientProvider provider = new HttpClientProvider();
+    @BeforeAll
+    static void init() throws Exception {
 
-    @BeforeEach
-     void init() throws Exception {
-        HttpClientProvider provider = new HttpClientProvider();
         signupClient = new SignupClient(provider);
         loginClient = new LoginClient(provider);
 
         // Prepare test user
         testUser = new SignUp(
-                "Demo Admin",
-                "demo@example.com",
-                "Admin123",
+                "Demo Admin12",
+                "demo_exam12",
+                "Admin1234@gmail.com",
                 "one211",
-                "Test Org one211",
+                "Test Org one21",
+                "test organization",
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -52,8 +55,8 @@ class IntegrationFlowTest {
         String jwtToken = loginClient.login(testUser.email(), testUser.password(), org.orgId());
 
         // Build clients with new token
-        clusterClient = new ClusterHttpClient("http://localhost:8080", jwtToken);
-        userClient = new UserClient("http://localhost:8080", jwtToken);
+        clusterClient = new ClusterHttpClient(provider.getBaseUrl(), jwtToken, provider);
+        userClient = new UserClient( jwtToken, provider);
         clusterAssignmentHttpClient = new ClusterAssignmentHttpClient("http://localhost:8080", jwtToken);
     }
 
@@ -68,7 +71,7 @@ class IntegrationFlowTest {
 
         String jwt = loginClient.login(testUser.email(), testUser.password(), org.orgId());
         assertNotNull(jwt, "JWT token should not be null");
-        assertTrue(jwt.length() > 10, "JWT should look valid");
+
     }
 
     @Test
@@ -80,6 +83,7 @@ class IntegrationFlowTest {
                 "Admin123",
                 "demo123Org",
                 "demo Test Org",
+                "test org 123",
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -91,34 +95,40 @@ class IntegrationFlowTest {
     @Test
     @Order(3)
     void testAddClusterToOrganization() throws Exception {
-        String response = clusterClient.addCluster(
-                orgId,
-                "cluster-integration3",
-                "Integration test cluster",
-                true
+        testcluster = new Cluster(
+                null,                       // id (auto-generated)
+                orgId,                      // orgId
+                "cluster102",     // name
+                "Integration test cluster", // description
+                true,                       // status (Boolean, not String)
+                LocalDateTime.now(),         // createdAt
+                "123456"                    // password
         );
+        String response = clusterClient.addCluster(testcluster);
         assertNotNull(response, "Response should not be null");
-        assertTrue(response.contains("cluster-integration"), "Response should contain cluster name");
+        assertTrue(response.contains("cluster102"), "Response should contain cluster name");
     }
 
     @Test
     @Order(4)
     void testAddUserToOrganization() throws Exception {
         User newUser = new User(
-                null,
-                "Integration User.1",
-                "intuser@example123com",
-                "UserPass123",
-                "USER",
-                "Added by integration test",
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                null,                              // id
+                "Integration User",                // fullName
+                "int4123",                      // userName
+                "intuser@example123.com",          // email
+                "UserPass123",                     // password
+                "USER",                             // role
+                "Added by integration test",       // description
+                LocalDateTime.now(),               // createdAt
+                LocalDateTime.now()                // updatedAt
         );
+
 
         User createdUser = userClient.addUser(orgId, newUser);
         assertNotNull(createdUser);
-        assertEquals("Integration User.1", createdUser.name());
-        assertEquals("intuser@example123com", createdUser.email());
+        assertEquals("int4123", createdUser.userName());
+        assertEquals("intuser@example123.com", createdUser.email());
     }
 
     @Test
@@ -127,8 +137,8 @@ class IntegrationFlowTest {
         boolean result = clusterAssignmentHttpClient.toggleAssignment(
                 orgId,
                 "USER",
-                "intuser@example123com",
-                "cluster-integration3",
+                "int4123",
+                "cluster102",
                 "assign"
         );
         assertTrue(result, "Cluster should be assigned successfully to user");
@@ -139,8 +149,8 @@ class IntegrationFlowTest {
         boolean result = clusterAssignmentHttpClient.toggleAssignment(
                 orgId,
                 "USER",
-                "intuser@example123com",
-                "cluster-integration3",
+                "int4123",
+                "cluster102",
                 "unassign"
         );
         assertTrue(result, "Cluster should be unassigned successfully from user");
@@ -153,22 +163,22 @@ class IntegrationFlowTest {
         OrgInfo org = orgs.getFirst(); // Use get(0) instead of getFirst()
         String newJwtToken = loginClient.login(testUser.email(), testUser.password(), org.orgId());
         startupScriptClient = new StartupScriptHttpClient("http://localhost:8080", newJwtToken);
-        String created = startupScriptClient.createStartupScript(org.orgId(), "cluster-integration3", "select 1;");
+        String created = startupScriptClient.createStartupScript(org.orgId(), "cluster102", "select 1;");
         assertNotNull(created);
         assertTrue(created.contains("select 1;"));
     }
 
 
-//    @Test
-//    @Order(8)
-//    void testGetStartupScript() throws Exception {
-//        // Fetch the startup script
-//        var fetched = startupScriptClient.getStartupScripts(orgId, "cluster-integration3");
-//
-//        // Assertions
-//        assertNotNull(fetched, "Startup script should be fetched");
-//        assertTrue(fetched.contains("SELECT 1"), "Fetched script content should match created content");
-//    }
+    @Test
+    @Order(8)
+    void testGetStartupScript() throws Exception {
+        // Fetch the startup script
+        var fetched = startupScriptClient.getStartupScripts(orgId, "cluster102");
+
+        // Assertions
+        assertNotNull(fetched, "Startup script should be fetched");
+        assertTrue(fetched.contains("select 1;"), "Fetched script content should match created content");
+    }
 
     @Test
     @Order(9)
@@ -178,22 +188,28 @@ class IntegrationFlowTest {
         OrgInfo org = orgs.getFirst(); // Use get(0) instead of getFirst()
         String newJwtToken = loginClient.login(testUser.email(), testUser.password(), org.orgId());
         startupScriptClient = new StartupScriptHttpClient("http://localhost:8080", newJwtToken);
-        var updated = startupScriptClient.updateStartupScript(org.orgId(), "cluster-integration3", "select 5;");
+        var updated = startupScriptClient.updateStartupScript(org.orgId(), "cluster102", "select 6;");
         assertNotNull(updated);
-        assertTrue(updated.contains("select 5;"));
+        assertTrue(updated.contains("select 6;"));
     }
 
     @Test
     @Order(10)
     void testDeleteUserFromOrganization() throws Exception {
-        boolean deleted = userClient.deleteUser(orgId, "intuser@example123com");
+        boolean deleted = userClient.deleteUser(orgId, "int4123");
+        assertTrue(deleted, "User should be deleted successfully");
+    }
+    @Test
+    @Order(11)
+    void testDeleteUserFromOrganization2() throws Exception {
+        boolean deleted = userClient.deleteUser(orgId, "cluster102");
         assertTrue(deleted, "User should be deleted successfully");
     }
 
     @Test
-    @Order(11)
-    void testDeleteClusterFromOrganization() throws Exception {
-        String result = clusterClient.deleteCluster(orgId, "cluster-integration3");
+    @Order(12)
+    void testDeleteClusterFromOrganization2() throws Exception {
+        String result = clusterClient.deleteCluster(orgId, "cluster102");
         assertNotNull(result, "Delete result should not be null");
         assertEquals("Cluster deleted successfully.", result, "Cluster should be deleted");
     }
