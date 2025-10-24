@@ -2,15 +2,15 @@
 
 Before running the full stack, build Docker images for each service:
 
-1. SQL Controller & Executor
+# 1. SQL Controller & Executor
 
-# Clone the repository
+## Clone the repository
 git clone https://github.com/one211-tech/sql.git
 
 ## Build the image
 docker build -t flight-sql-duckdb:latest .
 
-2. Frontend (React App)
+# 2. Frontend (React App)
 
 # Clone the repository
 git clone https://github.com/admin-one211/application-frontend.git
@@ -18,9 +18,9 @@ git clone https://github.com/admin-one211/application-frontend.git
 ## Build the image
 docker build -t react-app:latest .
 
-3. Backend (Spring Boot Application)
+# 3. Backend (Spring Boot Application)
 
-# Clone the repository
+## Clone the repository
 git clone https://github.com/admin-one211/application.git
 
 ## Build the image
@@ -32,14 +32,13 @@ After building all images, you can start the entire system using Docker Compose:
 docker compose up -d
 
 
-This will launch:
-
+### This will launch:
 *PostgreSQL database
 *Spring Boot backend
 *React frontend
 *Flight SQL Controller & Executor
 
-# Run Integration Tests (Cluster Testing)
+## Run Integration Tests (Cluster Testing)
 
 After building and starting all services with Docker Compose, you can verify the setup by running the integration test for cluster functionality.
 ### If no cluster exists yet:
