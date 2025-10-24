@@ -24,19 +24,20 @@ docker build -t react-app:latest .
 git clone https://github.com/admin-one211/application.git
 
 ## Build the image
+```bash
 docker build -t spring-application:latest .
 
 
-After building all images, you can start the entire system using Docker Compose:
+### After building all images, you can start the entire system using Docker Compose:
 
-docker compose up -d
+* docker compose up -d
 
 
 ### This will launch:
-*PostgreSQL database
-*Spring Boot backend
-*React frontend
-*Flight SQL Controller & Executor
+PostgreSQL database
+Spring Boot backend
+React frontend
+Flight SQL Controller & Executor
 
 ## Run Integration Tests (Cluster Testing)
 
