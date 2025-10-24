@@ -37,9 +37,9 @@ docker build -t spring-application:latest .
 ```
 
 ### This will launch:
-PostgreSQL database
-Spring Boot backend
-React frontend
+PostgreSQL database,
+Spring Boot backend,
+React frontend,
 Flight SQL Controller & Executor
 
 ## Run Integration Tests (Cluster Testing)
