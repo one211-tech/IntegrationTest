@@ -1,7 +1,7 @@
 package com.one211.restapi.service;
+
 import com.fasterxml.jackson.core.type.TypeReference;
-
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.one211.restapi.model.OrgInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,35 +23,45 @@ public class LoginClient {
 
     public List<OrgInfo> validate(String email, String password) throws Exception {
         String body = """
-            { "email": "%s", "password": "%s" }
+            { "emailOrUserName": "%s", "password": "%s" }
             """.formatted(email, password);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(provider.getBaseUrl() + "/login"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
                 .build();
+
         HttpResponse<String> response = provider.getClient().send(request, HttpResponse.BodyHandlers.ofString());
         log.debug("Validation response: {}", response.body());
         return provider.getMapper().readValue(response.body(), new TypeReference<>() {});
     }
 
-    public String login(String email, String password, Integer orgId) throws Exception {
+    // --- NEW flexible login ---
+    public String login(String email, String password, Object claimValue) throws Exception {
+        String claimsJson;
+
+        if (claimValue instanceof Number) {
+            claimsJson = "\"orgId\": " + claimValue;
+        } else {
+            // e.g. cluster name or other string claims
+            claimsJson = "\"cluster\": \"" + claimValue + "\"";
+        }
+
         String body = """
             {
-              "email": "%s",
+              "emailOrUserName": "%s",
               "password": "%s",
-              "claims": { "orgId": "%d" }
+              "claims": { %s }
             }
-            """.formatted(email, password, orgId);
+            """.formatted(email, password, claimsJson);
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(provider.getBaseUrl() + "/login"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
                 .build();
         HttpResponse<String> response = provider.getClient().send(request, HttpResponse.BodyHandlers.ofString());
-        log.debug("Login response: {}", response.body());
         Map<String, String> tokenResponse = provider.getMapper().readValue(response.body(), new TypeReference<>() {});
         return tokenResponse.get("token");
     }
-
 }

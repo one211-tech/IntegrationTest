@@ -41,9 +41,8 @@ services:
     command: >
       controller
       --conf flight-sql-controller.host=sql-controller
-      --conf flight-sql-controller.httpLogin=true
-      --conf flight-sql-controller.jwt.token.generation.enabled=false
-      --conf flight-sql-controller.jwt.token.secretKey=Xr7uYyL1p82bqS7dOqY5wrWb3YyF0TwQh8M9Z7Yz8Kz1c4Y3wTqZl9gN8mD7uC4yU2xJ8aQ5p9XoB3sD7yT9l8hG1k3uR2a
+      --conf 'flight-sql-controller.login.url="http://application-backend:8080/api/login"'
+
     ports:
       - "59307:59307"
 
@@ -55,10 +54,12 @@ services:
       executor
       --conf flight-sql-executor.controllers.0.host=sql-controller
       --conf flight-sql-executor.controllers.0.port=59307
-      --conf flight-sql-executor.cluster=cc1
+      --conf flight-sql-executor.cluster=cluster101
+      --conf flight-sql-executor.user=cluster101
+      --conf flight-sql-executor.password=123456
     depends_on:
       - sql-controller
 
-# 👇 this part was missing
+# volume
 volumes:
   postgres_data:
