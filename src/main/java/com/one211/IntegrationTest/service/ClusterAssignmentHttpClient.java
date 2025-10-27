@@ -1,4 +1,4 @@
-package com.one211.restapi.service;
+package com.one211.IntegrationTest.service;
 
 import java.net.URI;
 import java.net.http.HttpClient;

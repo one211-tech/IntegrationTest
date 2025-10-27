@@ -1,4 +1,4 @@
-package com.one211.restapi.service;
+package com.one211.IntegrationTest.service;
 
 import io.dazzleduck.sql.flight.server.auth2.AuthUtils;
 import org.apache.arrow.flight.*;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
 
 import java.util.Map;
 
-public class ControllerIntegrationTest {
+public class IntegrationTest {
 
     private static final String USER = "cluster101";
     private static final String PASSWORD = "123456";
@@ -45,7 +45,6 @@ public class ControllerIntegrationTest {
                 .build();
 
         flightSqlClient = new FlightSqlClient(flightClient);
-
         System.out.println("connected " + controllerLocation.getUri());
     }
 

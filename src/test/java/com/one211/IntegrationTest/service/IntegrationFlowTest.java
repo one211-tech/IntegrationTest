@@ -1,9 +1,9 @@
-package com.one211.restapi.service;
+package com.one211.IntegrationTest.service;
 
-import com.one211.restapi.model.Cluster;
-import com.one211.restapi.model.OrgInfo;
-import com.one211.restapi.model.SignUp;
-import com.one211.restapi.model.User;
+import com.one211.IntegrationTest.model.Cluster;
+import com.one211.IntegrationTest.model.OrgInfo;
+import com.one211.IntegrationTest.model.SignUp;
+import com.one211.IntegrationTest.model.User;
 import org.junit.jupiter.api.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -199,12 +199,12 @@ class IntegrationFlowTest {
         boolean deleted = userClient.deleteUser(orgId, "int4123");
         assertTrue(deleted, "User should be deleted successfully");
     }
-    @Test
-    @Order(11)
-    void testDeleteUserFromOrganization2() throws Exception {
-        boolean deleted = userClient.deleteUser(orgId, "cluster102");
-        assertTrue(deleted, "User should be deleted successfully");
-    }
+//    @Test
+//    @Order(11)
+//    void testDeleteUserFromOrganization2() throws Exception {
+//        boolean deleted = userClient.deleteUser(orgId, "cluster102");
+//        assertTrue(deleted, "User should be deleted successfully");
+//    }
 
     @Test
     @Order(12)

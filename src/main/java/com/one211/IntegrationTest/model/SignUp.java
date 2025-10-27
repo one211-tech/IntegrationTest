@@ -1,4 +1,4 @@
-package com.one211.restapi.model;
+package com.one211.IntegrationTest.model;
 
 import java.time.LocalDateTime;
 

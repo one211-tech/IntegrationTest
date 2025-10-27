@@ -1,4 +1,4 @@
-package com.one211.restapi.service;
+package com.one211.IntegrationTest.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

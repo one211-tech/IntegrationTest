@@ -1,7 +1,7 @@
-package com.one211.restapi.service;
+package com.one211.IntegrationTest.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.one211.restapi.model.AccessRow;
+import com.one211.IntegrationTest.model.AccessRow;
 
 import java.net.URI;
 import java.net.http.HttpClient;
