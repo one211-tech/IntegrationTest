@@ -7,28 +7,24 @@ Before running the full stack, build Docker images for each service:
 ## Clone the repository
 git clone https://github.com/one211-tech/sql.git
 
-## Build the image
-```bash
-docker build -t flight-sql-duckdb:latest .
-```
+### Build the Docker Image
+- Instructions to build the Docker image are available in the repository’s README.
+
 # 2. Frontend (React App)
 
 # Clone the repository
 git clone https://github.com/admin-one211/application-frontend.git
 
-## Build the image
-```bash
-docker build -t react-app:latest .
-```
+### Build the Docker Image
+- Instructions to build the Docker image are available in the repository’s README.
+  
 # 3. Backend (Spring Boot Application)
 
 ## Clone the repository
 git clone https://github.com/admin-one211/application.git
 
-## Build the image
-```bash
-docker build -t spring-application:latest .
-```
+### Build the Docker Image
+- Instructions to build the Docker image are available in the repository’s README.
 
 
 ### After building all images, you can start the entire system using Docker Compose:
@@ -47,10 +43,10 @@ Flight SQL Controller & Executor
 After building and starting all services with Docker Compose, you can verify the setup by running the integration test for cluster functionality.
 ### If no cluster exists yet:
 ```bash
-* mvn -Dtest=com.one211.restapi.service.IntegrationTest
+* mvn -Dtest=com.one211.IntegrationTest.service.SetupForIntegrationTest
 ```
-### If a test cluster is already present, skip IntegrationTest.java and instead run:
+### If a test cluster is already present, skip SetupForIntegrationTest.java and instead run:
 ```bash
-* mvn -Dtest=com.one211.restapi.service.ControllerIntegrationTest
+* mvn -Dtest=com.one211.IntegrationTest.service.IntegrationTest
 ```
 
