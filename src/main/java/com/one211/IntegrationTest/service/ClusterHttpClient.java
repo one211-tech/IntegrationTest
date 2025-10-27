@@ -1,6 +1,6 @@
-package com.one211.restapi.service;
+package com.one211.IntegrationTest.service;
 
-import com.one211.restapi.model.Cluster;
+import com.one211.IntegrationTest.model.Cluster;
 
 import java.net.URI;
 import java.net.http.HttpClient;

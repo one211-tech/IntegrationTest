@@ -1,8 +1,7 @@
-package com.one211.restapi.service;
+package com.one211.IntegrationTest.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.one211.restapi.model.OrgInfo;
+import com.one211.IntegrationTest.model.OrgInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
