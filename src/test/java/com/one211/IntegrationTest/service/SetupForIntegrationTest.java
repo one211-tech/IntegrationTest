@@ -3,12 +3,19 @@ package com.one211.IntegrationTest.service;
 import com.one211.IntegrationTest.model.Cluster;
 import com.one211.IntegrationTest.model.OrgInfo;
 import com.one211.IntegrationTest.model.SignUp;
+import io.dazzleduck.sql.flight.server.auth2.AuthUtils;
 import org.apache.arrow.flight.FlightClient;
+import org.apache.arrow.flight.FlightInfo;
+import org.apache.arrow.flight.Location;
 import org.apache.arrow.flight.sql.FlightSqlClient;
+import org.apache.arrow.memory.RootAllocator;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -85,7 +92,37 @@ public class SetupForIntegrationTest {
         clusterClient.addCluster(testcluster);
         startupScriptClient = new StartupScriptHttpClient("http://localhost:8080", jwtToken);
         startupScriptClient.createStartupScript(org.orgId(), "cluster101", "select 6;");
+        Location controllerLocation = Location.forGrpcTls("localhost", 59307);
+        Map<String, String> claims = Map.of(
+                "cluster", "cluster101",
+                "database", TEST_DATABASE,
+                "catalog", TEST_CATALOG,
+                "schema", TEST_SCHEMA,
+                "table", TEST_TABLE,
+                "filter", TEST_FILTER,
+                "path", TEST_PATH,
+                "function", TEST_FUNCTION
+        );
 
+        flightClient = FlightClient.builder()
+                .allocator(new RootAllocator())
+                .location(controllerLocation)
+                .intercept(AuthUtils.createClientMiddlewareFactory(USER, PASSWORD, claims))
+                .verifyServer(false)
+                .build();
+
+        flightSqlClient = new FlightSqlClient(flightClient);
+        System.out.println("Connected to " + controllerLocation.getUri());
     }
 
-}
+    @Test
+    @Order(1)
+    void executeGetFlightInfo() throws InterruptedException {
+        Thread.sleep(10_000);
+        String query = "SELECT 1";
+        FlightInfo flightInfo = flightSqlClient.execute(query);
+        assertNotNull(flightInfo);
+        System.out.println("FlightInfo successfully retrieved: " + flightInfo);
+    }
+
+    }
